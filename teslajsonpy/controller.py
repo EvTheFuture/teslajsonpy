@@ -206,6 +206,7 @@ class Controller:
         expiration: int = 0,
         update_interval: int = 300,
         enable_websocket: bool = False,
+        mfa_code: Text = None,
     ) -> None:
         """Initialize controller.
 
@@ -219,10 +220,11 @@ class Controller:
             update_interval (int, optional): Seconds between allowed updates to the API.  This is to prevent
             being blocked by Tesla. Defaults to 300.
             enable_websocket (bool, optional): Whether to connect with websockets. Defaults to False.
+            mfa_code (Text, optional): Multi-Factor Authentication code. Defaults to None.
 
         """
         self.__connection = Connection(
-            websession, email, password, access_token, refresh_token, expiration
+            websession, email, password, mfa_code, access_token, refresh_token, expiration
         )
         self.__components = []
         self._update_interval: int = update_interval

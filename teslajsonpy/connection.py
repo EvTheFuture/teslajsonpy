@@ -30,6 +30,7 @@ class Connection:
         websession: aiohttp.ClientSession,
         email: Text = None,
         password: Text = None,
+        mfa_code: Text = None,
         access_token: Text = None,
         refresh_token: Text = None,
         expiration: int = 0,
@@ -52,20 +53,21 @@ class Connection:
         self.refresh_token = refresh_token
         self.websession = websession
         self.token_refreshed = False
-        self.generate_oauth(email, password, refresh_token)
+        self.generate_oauth(email, password, mfa_code, refresh_token)
         if self.access_token:
             self.__sethead(access_token=self.access_token, expiration=self.expiration)
             _LOGGER.debug("Connecting with existing access token")
         self.websocket = None
 
     def generate_oauth(
-        self, email: Text = None, password: Text = None, refresh_token: Text = None
+        self, email: Text = None, password: Text = None, mfa_code: Text = None, refresh_token: Text = None
     ) -> None:
         """Generate oauth header.
 
         Args
             email (Text, optional): Tesla account email address. Defaults to None.
             password (Text, optional): Password for account. Defaults to None.
+            mfa_code (Text, optional): Multi-Factor Authentication code. Defaults to None.
             refresh_token (Text, optional): Refresh token. Defaults to None.
 
         Raises
@@ -81,6 +83,8 @@ class Connection:
             self.oauth["grant_type"] = "password"
             self.oauth["email"] = email
             self.oauth["password"] = password
+            if mfa_code:
+                self.oauth["mfaCode"] = mfa_code
         elif refresh_token:
             self.oauth["grant_type"] = "refresh_token"
             self.oauth["refresh_token"] = refresh_token
